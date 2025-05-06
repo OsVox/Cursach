@@ -231,7 +231,7 @@ if 'model' in st.session_state:
         
         # Добавляем данные о ВВП, если выбрана соответствующая опция
         if color_by_gdp:
-            gdp_data = pd.read_csv('/Users/andrejvorsin/Desktop/Курсовая/Coding part/data/gdp.csv')
+            gdp_data = pd.read_csv('data/gdp.csv')
             
             # Приводим названия стран к одному формату для корректного слияния
             gdp_data['country'] = gdp_data['country'].str.strip()
