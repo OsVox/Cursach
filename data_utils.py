@@ -9,7 +9,7 @@ def load_data():
     Данная функция кэшируется, поэтому данные загружаются только один раз,
     независимо от того, на какой странице приложения она вызывается.
     """
-    data_path = "/Users/andrejvorsin/Desktop/Курсовая/Coding part/data/net_export.csv"
+    data_path = "data/net_export.csv"
     start_time = time.time()
     df = pd.read_csv(data_path)
     load_time = time.time() - start_time
