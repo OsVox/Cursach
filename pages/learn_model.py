@@ -272,18 +272,31 @@ if 'model' in st.session_state:
     # Отображаем график
     st.plotly_chart(fig, use_container_width=True)
 
-    # Показываем таблицу с эмбеддингами для выбранных объектов
+    # Показываем таблицы с эмбеддингами стран и продуктов
     st.subheader("Табличное представление эмбеддингов")
-    embedding_table = all_data_3d.rename(
-        columns={
-            'x': 'factor_1',
-            'y': 'factor_2',
-            'z': 'factor_3',
-            'name': 'Название',
-            'type': 'Тип'
-        }
+
+    country_table = pd.DataFrame(
+        model.country_vectors,
+        columns=[f"factor_{i+1}" for i in range(model.n_factors)],
     )
-    st.dataframe(embedding_table)
+    country_table.insert(0, "Страна", country_names)
+
+    product_table = pd.DataFrame(
+        model.product_vectors,
+        columns=[f"factor_{i+1}" for i in range(model.n_factors)],
+    )
+    product_table.insert(0, "Продукт", product_names)
+
+    st.session_state["country_embedding_table"] = country_table
+    st.session_state["product_embedding_table"] = product_table
+
+    col_c, col_p = st.columns(2)
+    with col_c:
+        st.markdown("**Страны**")
+        st.dataframe(country_table)
+    with col_p:
+        st.markdown("**Продукты**")
+        st.dataframe(product_table)
 
     # Экспорт результатов
     if st.button("Экспортировать результаты"):
