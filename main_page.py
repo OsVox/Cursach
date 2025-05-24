@@ -9,7 +9,7 @@ import os
 import plotly.express as px
 
 # Импортируем функцию загрузки данных из общего модуля
-from data_utils import load_data
+from dropbox_utils import load_data_from_dropbox
 
 # Настройка страницы
 st.set_page_config(
@@ -24,7 +24,7 @@ st.write("Этот инструмент позволяет анализиров�
 
 # Загрузка данных (используем общую функцию кэширования)
 with st.spinner("Загрузка данных..."):
-    df, load_time = load_data()
+    df, load_time = load_data_from_dropbox(st.secrets["NET_EXPORT_DATA_PATH"])
     st.success(f"Данные успешно загружены за {load_time:.2f} секунд!")
 
 # Показ базовой информации о данных

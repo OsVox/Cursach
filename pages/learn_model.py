@@ -10,8 +10,7 @@ import umap
 import plotly.express as px
 
 
-from data_utils import load_data
-
+from dropbox_utils import load_data_from_dropbox
 from learning_a_model import ComparativeAdvantageModel
 
 # Настройка страницы
@@ -29,7 +28,7 @@ st.write("На этой странице вы можете обучить мод
 if 'filtered_data' not in st.session_state:
     # Если данных нет, загружаем и фильтруем данные
     with st.spinner("Загрузка данных..."):
-        df, load_time = load_data()  # Используем общую функцию кэширования
+        df, load_time = load_data_from_dropbox(st.secrets["GDP_DATA_PATH"])  # Используем общую функцию кэширования
         st.success(f"Данные успешно загружены за {load_time:.2f} секунд!")
     
     st.warning("Вы перешли на страницу обучения модели без предварительной фильтрации данных. Используйте полный набор данных или вернитесь на главную страницу для фильтрации.")
@@ -229,7 +228,7 @@ if 'model' in st.session_state:
         
         # Добавляем данные о ВВП, если выбрана соответствующая опция
         if color_by_gdp:
-            gdp_data = pd.read_csv('data/gdp.csv')
+            gdp_data, load_time = load_data_from_dropbox(st.secrets["GDP_DATA_PATH"])
             
             # Приводим названия стран к одному формату для корректного слияния
             gdp_data['country'] = gdp_data['country'].str.strip()
