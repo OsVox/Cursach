@@ -257,9 +257,9 @@ if 'model' in st.session_state:
     all_data_3d = pd.concat(data_frames_3d, ignore_index=True)
 
     fig = px.scatter_3d(
-        all_data_3d, 
-        x='x', 
-        y='y', 
+        all_data_3d,
+        x='x',
+        y='y',
         z='z',
         color='gdp_ppp' if color_by_gdp else 'type',
         hover_name='name',
@@ -268,9 +268,22 @@ if 'model' in st.session_state:
         width=1000,
         height=800
     )
-    
+
     # Отображаем график
     st.plotly_chart(fig, use_container_width=True)
+
+    # Показываем таблицу с эмбеддингами для выбранных объектов
+    st.subheader("Табличное представление эмбеддингов")
+    embedding_table = all_data_3d.rename(
+        columns={
+            'x': 'factor_1',
+            'y': 'factor_2',
+            'z': 'factor_3',
+            'name': 'Название',
+            'type': 'Тип'
+        }
+    )
+    st.dataframe(embedding_table)
 
     # Экспорт результатов
     if st.button("Экспортировать результаты"):
