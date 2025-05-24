@@ -289,6 +289,7 @@ if 'model' in st.session_state:
     product_table.insert(0, "Продукт", product_names)
     st.dataframe(product_table)
 
+
     # Экспорт результатов
     if st.button("Экспортировать результаты"):
         # Создаем DataFrame для экспорта
