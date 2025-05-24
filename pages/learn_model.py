@@ -257,9 +257,9 @@ if 'model' in st.session_state:
     all_data_3d = pd.concat(data_frames_3d, ignore_index=True)
 
     fig = px.scatter_3d(
-        all_data_3d, 
-        x='x', 
-        y='y', 
+        all_data_3d,
+        x='x',
+        y='y',
         z='z',
         color='gdp_ppp' if color_by_gdp else 'type',
         hover_name='name',
@@ -268,9 +268,26 @@ if 'model' in st.session_state:
         width=1000,
         height=800
     )
-    
+
     # Отображаем график
     st.plotly_chart(fig, use_container_width=True)
+
+    # Показываем таблицы с эмбеддингами стран и продуктов
+    st.subheader("Эмбеддинги стран")
+    country_table = pd.DataFrame(
+        model.country_vectors,
+        columns=[f"factor_{i+1}" for i in range(model.n_factors)]
+    )
+    country_table.insert(0, "Страна", country_names)
+    st.dataframe(country_table)
+
+    st.subheader("Эмбеддинги продуктов")
+    product_table = pd.DataFrame(
+        model.product_vectors,
+        columns=[f"factor_{i+1}" for i in range(model.n_factors)]
+    )
+    product_table.insert(0, "Продукт", product_names)
+    st.dataframe(product_table)
 
     # Экспорт результатов
     if st.button("Экспортировать результаты"):
