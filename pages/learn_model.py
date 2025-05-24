@@ -10,10 +10,8 @@ import umap
 import plotly.express as px
 
 
-sys.path.append('/Users/andrejvorsin/Desktop/Курсовая/Coding part/')
 from data_utils import load_data
 
-sys.path.append('/Users/andrejvorsin/Desktop/Курсовая/Coding part/')
 from learning_a_model import ComparativeAdvantageModel
 
 # Настройка страницы
