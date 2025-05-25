@@ -24,7 +24,15 @@ st.write("Этот инструмент позволяет анализиров�
 
 # Загрузка данных (используем общую функцию кэширования)
 with st.spinner("Загрузка данных..."):
-    df, load_time = load_data_from_dropbox(st.secrets["NET_EXPORT_DATA_PATH"])
+    df, load_time = load_data_from_dropbox(
+        st.secrets["NET_EXPORT_DATA_PATH"],
+        app_key=st.secrets["APP_KEY"],
+        app_secret=st.secrets["APP_SECRET"],
+        refresh_token=st.secrets["REFRESH_TOKEN"]
+    )
+
+    df['year'] = 2022
+
     st.success(f"Данные успешно загружены за {load_time:.2f} секунд!")
 
 # Показ базовой информации о данных
@@ -64,7 +72,21 @@ with st.form("filter_form"):
             value=100,
             help="Выберите количество продуктов для анализа"
         )
+
+    # Добавляем слайдеры для выбора диапазона лет
+    st.write("Выберите диапазон лет:")
+    # Предполагаем, что в df есть столбец 'year'
+    min_year = int(df['year'].min() - 1)
+    max_year = int(df['year'].max() + 1)
+    selected_years = st.slider(
+        "Годы",
+        min_value=min_year,
+        max_value=max_year,
+        value=(min_year, max_year),
+        help="Выберите начальный и конечный год для анализа"
+    )
     
+    # Добавляем кнопку отправки формы
     submit_button = st.form_submit_button("Применить фильтры")
 
 # Применение фильтров и отображение результатов
@@ -79,7 +101,8 @@ if submit_button or 'filtered_data' not in st.session_state:
         # Фильтрация данных
         filtered_data = df[
             (df['country'].isin(top_countries_list)) & 
-            (df['hs_product_description'].isin(top_products_list))
+            (df['hs_product_description'].isin(top_products_list)) &
+            (df['year'] >= selected_years[0]) & (df['year'] <= selected_years[1]) # Фильтр по годам
         ]
         
         st.session_state['filtered_data'] = filtered_data

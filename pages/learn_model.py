@@ -11,7 +11,7 @@ import plotly.express as px
 
 
 from dropbox_utils import load_data_from_dropbox
-from learning_a_model import ComparativeAdvantageModel
+from models_utils import ComparativeAdvantageModel
 
 # Настройка страницы
 st.set_page_config(
@@ -24,11 +24,17 @@ st.set_page_config(
 st.title("🧠 Обучение модели сравнительных преимуществ")
 st.write("На этой странице вы можете обучить модель сравнительных преимуществ на основе отфильтрованных данных.")
 
+gdp_data, load_time = load_data_from_dropbox(
+    st.secrets["GDP_DATA_PATH"],
+    app_key=st.secrets["APP_KEY"],
+    app_secret=st.secrets["APP_SECRET"],
+    refresh_token=st.secrets["REFRESH_TOKEN"]
+)
+
 # Проверяем, есть ли в session_state отфильтрованные данные
 if 'filtered_data' not in st.session_state:
     # Если данных нет, загружаем и фильтруем данные
     with st.spinner("Загрузка данных..."):
-        df, load_time = load_data_from_dropbox(st.secrets["GDP_DATA_PATH"])  # Используем общую функцию кэширования
         st.success(f"Данные успешно загружены за {load_time:.2f} секунд!")
     
     st.warning("Вы перешли на страницу обучения модели без предварительной фильтрации данных. Используйте полный набор данных или вернитесь на главную страницу для фильтрации.")
@@ -163,11 +169,11 @@ if st.button("Обучить модель", type="primary"):
             st.session_state['model_threshold'] = threshold
             st.session_state['n_factors'] = min(3, model.n_factors)
 
-            country_reducer = umap.UMAP(n_components=st.session_state['n_factors'], random_state=42)
+            country_reducer = umap.UMAP(n_components=st.session_state['n_factors'])
             country_embedding = country_reducer.fit_transform(model.country_vectors)
             
             # Создаем UMAP-проекцию для продуктов
-            product_reducer = umap.UMAP(n_components=st.session_state['n_factors'], random_state=42)
+            product_reducer = umap.UMAP(n_components=st.session_state['n_factors'])
             product_embedding = product_reducer.fit_transform(model.product_vectors)
             
             st.session_state['country_embedding'] = country_embedding
@@ -228,7 +234,6 @@ if 'model' in st.session_state:
         
         # Добавляем данные о ВВП, если выбрана соответствующая опция
         if color_by_gdp:
-            gdp_data, load_time = load_data_from_dropbox(st.secrets["GDP_DATA_PATH"])
             
             # Приводим названия стран к одному формату для корректного слияния
             gdp_data['country'] = gdp_data['country'].str.strip()
