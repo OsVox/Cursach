@@ -10,7 +10,7 @@ import umap
 import plotly.express as px
 
 
-from data_utils import load_data
+from data_utils import load_data, load_gdp_data
 
 from learning_a_model import ComparativeAdvantageModel
 
@@ -229,17 +229,17 @@ if 'model' in st.session_state:
         
         # Добавляем данные о ВВП, если выбрана соответствующая опция
         if color_by_gdp:
-            gdp_data = pd.read_csv('data/gdp.csv')
-            
+            gdp_data, _ = load_gdp_data()
+
             # Приводим названия стран к одному формату для корректного слияния
             gdp_data['country'] = gdp_data['country'].str.strip()
             country_df_3d['country'] = country_df_3d['name'].str.strip()
-            
+
             # Объединяем данные
             country_df_3d = country_df_3d.merge(
-                gdp_data[['country', 'gdp_ppp']], 
-                left_on='country', 
-                right_on='country', 
+                gdp_data[['country', 'gdp_ppp']],
+                left_on='country',
+                right_on='country',
                 how='left'
             )
     
@@ -257,9 +257,9 @@ if 'model' in st.session_state:
     all_data_3d = pd.concat(data_frames_3d, ignore_index=True)
 
     fig = px.scatter_3d(
-        all_data_3d, 
-        x='x', 
-        y='y', 
+        all_data_3d,
+        x='x',
+        y='y',
         z='z',
         color='gdp_ppp' if color_by_gdp else 'type',
         hover_name='name',
@@ -268,9 +268,22 @@ if 'model' in st.session_state:
         width=1000,
         height=800
     )
-    
+
     # Отображаем график
     st.plotly_chart(fig, use_container_width=True)
+
+    # Показываем таблицу с эмбеддингами для выбранных объектов
+    st.subheader("Табличное представление эмбеддингов")
+    embedding_table = all_data_3d.rename(
+        columns={
+            'x': 'factor_1',
+            'y': 'factor_2',
+            'z': 'factor_3',
+            'name': 'Название',
+            'type': 'Тип'
+        }
+    )
+    st.dataframe(embedding_table)
 
     # Экспорт результатов
     if st.button("Экспортировать результаты"):
